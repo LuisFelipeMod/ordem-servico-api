@@ -1,0 +1,27 @@
+# Dependências
+/vendor/
+
+# Variáveis de ambiente
+.env
+
+# Configurações do Composer que não precisam ser versionadas
+composer.lock
+
+# Logs
+src/Logs/
+*.log
+
+# Cache ou arquivos temporários
+*.cache
+*.tmp
+*.bak
+
+# IDEs e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db

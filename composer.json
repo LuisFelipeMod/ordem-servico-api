@@ -1,0 +1,15 @@
+{
+    "name": "luis_modesto/ordem-servico-api",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Luis Modesto",
+            "email": "luisgmodesto12@gmail.com"
+        }
+    ],
+    "require": {}
+}
