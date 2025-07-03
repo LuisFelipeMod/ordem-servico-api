@@ -14,6 +14,12 @@ class ClienteController
     $cpf = $dados['cpf'] ?? '';
     $endereco = $dados['endereco'] ?? '';
 
+    if (empty($cpf)) {
+      http_response_code(400);
+      echo json_encode(['erro' => 'CPF ausente']);
+      return;
+    }
+
     if (!Validador::cpf($cpf)) {
       http_response_code(400);
       echo json_encode(['erro' => 'CPF inválido']);
@@ -28,7 +34,7 @@ class ClienteController
 
     if ($stmt->fetch()) {
       http_response_code(400);
-      echo json_encode(['erro' > 'CPF já cadastrado']);
+      echo json_encode(['erro' => 'CPF já cadastrado']);
       return;
     }
 
@@ -40,12 +46,62 @@ class ClienteController
 
   public function listar()
   {
-    error_log("🚀 Entrou no método listar()");
     $pdo = Database::connect();
 
     $stmt = $pdo->query("SELECT * FROM clientes");
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     echo json_encode($result);
+  }
+  public function atualizar($dados)
+  {
+    $pdo = Database::connect();
+    $cpf = $dados['cpf'] ?? '';
+    $nome = $dados['nome'] ?? '';
+    $endereco  = $dados['endereco'] ?? '';
+
+    if (!$cpf || !Validador::cpf($cpf)) {
+      http_response_code(400);
+      echo json_encode(['erro' => 'CPF Inválido ou ausente']);
+      return;
+    }
+
+    $stmt = $pdo->prepare("SELECT id FROM clientes WHERE cpf = ?");
+    $stmt->execute([$cpf]);
+
+    if (!$stmt->fetch()) {
+      http_response_code(404);
+      echo json_encode(['erro' => 'Cliente não encontrado']);
+      return;
+    }
+
+    $stmt = $pdo->prepare("UPDATE clientes SET nome = ?, endereco = ? WHERE cpf = ?");
+    $stmt->execute([$nome, $endereco, $cpf]);
+
+    echo json_encode(['msg' => 'Cliente atualizado com sucesso']);
+  }
+  public function excluir($dados){
+    $pdo = Database::connect();
+    $cpf = $dados['cpf'] ?? '';
+
+    if(!$cpf || !Validador::cpf($cpf)){
+      http_response_code(400);
+      echo json_encode(['erro' => 'CPF inválido ou ausente']);
+      return;
+    }
+
+    $stmt = $pdo->prepare("SELECT id FROM clientes WHERE cpf = ?");
+    $stmt->execute([$cpf]);
+
+    if(!$stmt->fetch()) {
+      http_response_code(404);
+      echo json_encode("Cliente não encontrado");
+      return;
+    }
+
+    $stmt = $pdo->prepare("DELETE FROM clientes WHERE cpf = ?");
+    $stmt->execute([$cpf]);
+
+    echo json_encode('Cliente deletado com sucesso');
   }
 }
