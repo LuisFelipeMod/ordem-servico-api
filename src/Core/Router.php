@@ -1,5 +1,8 @@
 <?php
+
 namespace App\Core;
+
+use App\Controllers\ClienteController;
 
 class Router
 {
@@ -8,13 +11,22 @@ class Router
         $uri = $_SERVER['REQUEST_URI'];
         $method = $_SERVER['REQUEST_METHOD'];
 
+        $cliente_controller = new ClienteController();
+
         header('Content-Type: application/json');
 
         if ($uri === '/api/clientes' && $method === 'GET') {
-            echo json_encode(['msg' => 'Listando clientes']);
-        } else {
-            http_response_code(404);
-            echo json_encode(['error' => 'Rota não encontrada']);
+            $cliente_controller->listar();
+            return;
         }
+        if ($uri === '/api/clientes' && $method === 'POST') {
+            $body = file_get_contents('php://input');
+            $dados = json_decode($body, true);
+            $cliente_controller->criar($dados);
+            return;
+        }
+
+        http_response_code(400);
+        echo json_encode(['erro' => 'Rota nao encontrada']);
     }
 }
