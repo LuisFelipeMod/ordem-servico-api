@@ -25,6 +25,18 @@ class Router
             $cliente_controller->criar($dados);
             return;
         }
+        if ($uri === '/api/clientes' && $method === 'PUT') {
+            $body = file_get_contents('php://input');
+            $dados = json_decode($body, true);
+            $cliente_controller->atualizar($dados);
+            return;
+        }
+        if ($uri === '/api/clientes' && $method === 'DELETE') {
+            $body = file_get_contents('php://input');
+            $dados = json_decode($body, true);
+            $cliente_controller->excluir($dados);
+            return;
+        }
 
         http_response_code(400);
         echo json_encode(['erro' => 'Rota nao encontrada']);
