@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Core\Database;
+use App\Helpers\Validador;
+use PDO;
+
+class ClienteController
+{
+  public function criar($dados)
+  {
+    $nome = $dados['nome'] ?? '';
+    $cpf = $dados['cpf'] ?? '';
+    $endereco = $dados['endereco'] ?? '';
+
+    if (!Validador::cpf($cpf)) {
+      http_response_code(400);
+      echo json_encode(['erro' => 'CPF inválido']);
+      return;
+    }
+
+    $pdo = Database::connect();
+
+    // Verifica duplicidade
+    $stmt = $pdo->prepare("SELECT id FROM clientes WHERE cpf = ?");
+    $stmt->execute([$cpf]);
+
+    if ($stmt->fetch()) {
+      http_response_code(400);
+      echo json_encode(['erro' > 'CPF já cadastrado']);
+      return;
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO clientes (nome,cpf,endereco) VALUES (?, ?, ?)");
+    $stmt->execute([$nome, $cpf, $endereco]);
+
+    echo json_encode(['msg' => 'Cliente cadastrado com sucesso']);
+  }
+
+  public function listar()
+  {
+    error_log("🚀 Entrou no método listar()");
+    $pdo = Database::connect();
+
+    $stmt = $pdo->query("SELECT * FROM clientes");
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    echo json_encode($result);
+  }
+}
