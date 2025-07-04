@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Helpers;
 
 use Firebase\JWT\JWT;
@@ -22,7 +23,7 @@ class Auth
     $payload = [
       'iss' => 'ordem-servico-api',
       'iat' => time(),
-      'exp' => time() + (60 * 60),
+      'exp' => time() + (60 * 60 * 24), // 24 horas
       'dados' => $dados
     ];
 

@@ -80,14 +80,14 @@ class ClienteController
 
     echo json_encode(['msg' => 'Cliente atualizado com sucesso']);
   }
-  public function excluir($dados){
+  public function excluir($query){
     $pdo = Database::connect();
-    $cpf = $dados['cpf'] ?? '';
+    $cpf = $query['cpf'] ?? '';
 
-    if(!$cpf || !Validador::cpf($cpf)){
-      http_response_code(400);
-      echo json_encode(['erro' => 'CPF inválido ou ausente']);
-      return;
+    if (!$cpf || !Validador::cpf($cpf)) {
+        http_response_code(400);
+        echo json_encode(['erro' => 'CPF inválido ou ausente']);
+        return;
     }
 
     $stmt = $pdo->prepare("SELECT id FROM clientes WHERE cpf = ?");

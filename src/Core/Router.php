@@ -12,7 +12,7 @@ class Router
 {
     public function handleRequest()
     {
-        $uri = $_SERVER['REQUEST_URI'];
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
 
         $cliente_controller = new ClienteController();
@@ -48,7 +48,7 @@ class Router
             return;
         }
         if ($uri === '/api/clientes' && $method === 'DELETE') {
-            parse_str(parse_url($uri, PHP_URL_QUERY) ?: '', $query);
+            parse_str($_SERVER['QUERY_STRING'] ?? '', $query);
             $cliente_controller->excluir($query);
             return;
         }
@@ -70,7 +70,7 @@ class Router
             return;
         }
         if ($uri === '/api/produtos' && $method === 'DELETE') {
-            parse_str(parse_url($uri, PHP_URL_QUERY) ?: '', $query);
+            parse_str($_SERVER['QUERY_STRING'] ?? '', $query);
             $produtos_controller->excluir($query);
             return;
         }
@@ -92,10 +92,15 @@ class Router
             return;
         }
         if ($uri === '/api/ordens_servico' && $method === 'DELETE') {
-            parse_str(parse_url($uri, PHP_URL_QUERY) ?: '', $query);
+            parse_str($_SERVER['QUERY_STRING'] ?? '', $query);
             $ordens_servico_controller->excluir($query);
             return;
         }
+        if ($uri === '/api/ordens_servico/logs' && $method === 'GET') {
+            $ordens_servico_controller->logs();
+            return;
+        }
+
 
         http_response_code(400);
         echo json_encode(['erro' => 'Rota não encontrada']);
