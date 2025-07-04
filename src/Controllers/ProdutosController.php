@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Core\Database;
-use App\Core\Validador;
 use PDO;
 
 class ProdutosController
