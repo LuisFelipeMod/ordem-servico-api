@@ -3,6 +3,7 @@
 namespace App\Core;
 
 use App\Controllers\ClienteController;
+use App\Controllers\ProdutosController;
 
 class Router
 {
@@ -12,6 +13,7 @@ class Router
         $method = $_SERVER['REQUEST_METHOD'];
 
         $cliente_controller = new ClienteController();
+        $produtos_controller = new ProdutosController();
 
         header('Content-Type: application/json');
 
@@ -35,6 +37,28 @@ class Router
             $body = file_get_contents('php://input');
             $dados = json_decode($body, true);
             $cliente_controller->excluir($dados);
+            return;
+        }
+        if ($uri === '/api/produtos' && $method === 'GET') {
+            $produtos_controller->listar();
+            return;
+        }
+        if ($uri === '/api/produtos' && $method === 'POST') {
+            $body = file_get_contents('php://input');
+            $dados = json_decode($body, true);
+            $produtos_controller->criar($dados);
+            return;
+        }
+        if ($uri === '/api/produtos' && $method === 'PUT') {
+            $body = file_get_contents('php://input');
+            $dados = json_decode($body, true);
+            $produtos_controller->atualizar($dados);
+            return;
+        }
+        if ($uri === '/api/produtos' && $method === 'DELETE') {
+            $body = file_get_contents('php://input');
+            $dados = json_decode($body, true);
+            $produtos_controller->excluir($dados);
             return;
         }
 
