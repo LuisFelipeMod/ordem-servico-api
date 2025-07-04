@@ -5,14 +5,15 @@ namespace App\Controllers;
 use App\Core\Database;
 use App\Helpers\Validador;
 use PDO;
+use App\Helpers\Sanitizer;
 
 class ClienteController
 {
   public function criar($dados)
   {
-    $nome = $dados['nome'] ?? '';
-    $cpf = $dados['cpf'] ?? '';
-    $endereco = $dados['endereco'] ?? '';
+    $nome =  Sanitizer::sanitizeInput($dados['nome'] ?? '');
+    $cpf =  Sanitizer::sanitizeInput($dados['cpf'] ?? '');
+    $endereco =  Sanitizer::sanitizeInput($dados['endereco'] ?? '');
 
     if (empty($cpf)) {
       http_response_code(400);
@@ -28,7 +29,6 @@ class ClienteController
 
     $pdo = Database::connect();
 
-    // Verifica duplicidade
     $stmt = $pdo->prepare("SELECT id FROM clientes WHERE cpf = ?");
     $stmt->execute([$cpf]);
 
