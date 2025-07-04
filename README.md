@@ -87,7 +87,7 @@ DELETE /api/clientes - deletar cliente (requer token)
 
 ## Documentação
 
-A documentação da API está disponível no arquivo swagger.yaml. Use o [Swagger Editor](https://editor.swagger.io/) para visualizar.
+A documentação da API está disponível no arquivo src/swagger/swagger.json. Use o [Swagger Editor](https://editor.swagger.io/) para visualizar.
 
 ## Segurança
 
