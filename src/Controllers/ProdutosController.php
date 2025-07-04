@@ -39,11 +39,30 @@ class ProdutosController
   public function listar()
   {
     $pdo = Database::connect();
-    $stmt = $pdo->query("SELECT * FROM produtos");
+
+    $status = $_GET['status'] ?? '';
+    $tempo_garantia = $_GET['tempo_garantia'] ?? '';
+
+    $query = "SELECT * FROM produtos WHERE 1=1";
+    $params = [];
+
+    if ($status) {
+      $query .= " AND status = ?";
+      $params[] = $status;
+    }
+
+    if ($tempo_garantia !== '') {
+      $query .= " AND tempo_garantia = ?";
+      $params[] = $tempo_garantia;
+    }
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($params);
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode($result);
   }
+
   public function atualizar($dados)
   {
     $pdo = Database::connect();
@@ -83,16 +102,16 @@ class ProdutosController
   public function excluir($dados)
   {
     $pdo = Database::connect();
-    $codigo = $dados['codigo'] ?? '';
+    $id = $dados['id'] ?? '';
 
-    if (!$codigo) {
+    if (!$id || !is_numeric($id)) {
       http_response_code(400);
-      echo json_encode(['erro' => 'Código inválido ou ausente']);
+      echo json_encode(['erro' => 'ID inválido ou ausente']);
       return;
     }
 
-    $stmt = $pdo->prepare("SELECT id FROM produtos WHERE codigo = ?");
-    $stmt->execute([$codigo]);
+    $stmt = $pdo->prepare("SELECT id FROM produtos WHERE id = ?");
+    $stmt->execute([$id]);
 
     if (!$stmt->fetch()) {
       http_response_code(404);
@@ -100,8 +119,8 @@ class ProdutosController
       return;
     }
 
-    $stmt = $pdo->prepare("DELETE FROM produtos WHERE codigo = ?");
-    $stmt->execute([$codigo]);
+    $stmt = $pdo->prepare("DELETE FROM produtos WHERE id = ?");
+    $stmt->execute([$id]);
 
     echo json_encode(['msg' => 'Produto deletado com sucesso']);
   }

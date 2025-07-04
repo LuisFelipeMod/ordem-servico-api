@@ -6,16 +6,14 @@ use App\Controllers\ClienteController;
 use App\Controllers\OrdemServicoController;
 use App\Controllers\ProdutosController;
 use App\Controllers\AuthController;
+use App\Middleware\Middleware;
 
 class Router
 {
     public function handleRequest()
     {
-        $uri = $_SERVER['REQUEST_URI'];
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
-
-        // Limpa query string da URI para facilitar comparação
-        $uri_path = parse_url($uri, PHP_URL_PATH);
 
         $cliente_controller = new ClienteController();
         $produtos_controller = new ProdutosController();
@@ -24,7 +22,7 @@ class Router
 
         header('Content-Type: application/json');
 
-        if ($uri_path === '/api/login' && $method === 'POST') {
+        if ($uri === '/api/login' && $method === 'POST') {
             $body = file_get_contents('php://input');
             $dados = json_decode($body, true);
             $auth_controller->login($dados);
@@ -33,71 +31,78 @@ class Router
 
         $usuario = Middleware::proteger();
 
-        if ($uri_path === '/api/clientes' && $method === 'GET') {
+        if ($uri === '/api/clientes' && $method === 'GET') {
             $cliente_controller->listar();
             return;
         }
-        if ($uri_path === '/api/clientes' && $method === 'POST') {
+        if ($uri === '/api/clientes' && $method === 'POST') {
             $body = file_get_contents('php://input');
             $dados = json_decode($body, true);
             $cliente_controller->criar($dados);
             return;
         }
-        if ($uri_path === '/api/clientes' && $method === 'PUT') {
+        if ($uri === '/api/clientes' && $method === 'PUT') {
             $body = file_get_contents('php://input');
             $dados = json_decode($body, true);
             $cliente_controller->atualizar($dados);
             return;
         }
-        if ($uri_path === '/api/clientes' && $method === 'DELETE') {
-            $cpf = $_GET['cpf'] ?? null;
-            $cliente_controller->excluir(['cpf' => $cpf]);
+        if ($uri === '/api/clientes' && $method === 'DELETE') {
+            parse_str($_SERVER['QUERY_STRING'] ?? '', $query);
+            $cliente_controller->excluir($query);
             return;
         }
-        if ($uri_path === '/api/produtos' && $method === 'GET') {
+
+        if ($uri === '/api/produtos' && $method === 'GET') {
             $produtos_controller->listar();
             return;
         }
-        if ($uri_path === '/api/produtos' && $method === 'POST') {
+        if ($uri === '/api/produtos' && $method === 'POST') {
             $body = file_get_contents('php://input');
             $dados = json_decode($body, true);
             $produtos_controller->criar($dados);
             return;
         }
-        if ($uri_path === '/api/produtos' && $method === 'PUT') {
+        if ($uri === '/api/produtos' && $method === 'PUT') {
             $body = file_get_contents('php://input');
             $dados = json_decode($body, true);
             $produtos_controller->atualizar($dados);
             return;
         }
-        if ($uri_path === '/api/produtos' && $method === 'DELETE') {
-            $codigo = $_GET['codigo'] ?? null;
-            $produtos_controller->excluir(['codigo' => $codigo]);
+        if ($uri === '/api/produtos' && $method === 'DELETE') {
+            parse_str($_SERVER['QUERY_STRING'] ?? '', $query);
+            $produtos_controller->excluir($query);
             return;
         }
-        if ($uri_path === '/api/ordens_servico' && $method === 'GET') {
+
+        if ($uri === '/api/ordens_servico' && $method === 'GET') {
             $ordens_servico_controller->listar();
             return;
         }
-        if ($uri_path === '/api/ordens_servico' && $method === 'POST') {
+        if ($uri === '/api/ordens_servico' && $method === 'POST') {
             $body = file_get_contents('php://input');
             $dados = json_decode($body, true);
             $ordens_servico_controller->criar($dados);
             return;
         }
-        if ($uri_path === '/api/ordens_servico' && $method === 'PUT') {
+        if ($uri === '/api/ordens_servico' && $method === 'PUT') {
             $body = file_get_contents('php://input');
             $dados = json_decode($body, true);
             $ordens_servico_controller->atualizar($dados);
             return;
         }
-        if ($uri_path === '/api/ordens_servico' && $method === 'DELETE') {
-            $id = $_GET['id'] ?? null;
-            $ordens_servico_controller->excluir(['id' => $id]);
+        if ($uri === '/api/ordens_servico' && $method === 'DELETE') {
+            parse_str($_SERVER['QUERY_STRING'] ?? '', $query);
+            $ordens_servico_controller->excluir($query);
+            return;
+        }
+        if ($uri === '/api/ordens_servico/logs' && $method === 'GET') {
+            $ordens_servico_controller->logs();
             return;
         }
 
+
         http_response_code(400);
-        echo json_encode(['erro' => 'Rota nao encontrada']);
+        echo json_encode(['erro' => 'Rota não encontrada']);
     }
 }

@@ -177,10 +177,60 @@ class OrdemServicoController
     $stmt = $pdo->prepare("DELETE FROM ordens_servico WHERE id = ?");
     $stmt->execute([$id]);
 
-    // Log de exclusão
-    $log = $pdo->prepare("INSERT INTO logs_ordens_servico (ordem_id, acao, detalhes) VALUES (?, 'excluido', ?::jsonb)");
-    $log->execute([$id, json_encode($ordem)]);
+    $ordem_json = json_encode($ordem ?: []);
+
+    try {
+      $log = $pdo->prepare("INSERT INTO logs_ordens_servico (ordem_id, acao, detalhes) VALUES (?, 'excluido', ?)");
+      $log->execute([$id, $ordem_json]);
+    } catch (\PDOException $e) {
+      error_log('Erro ao registrar log de exclusão: ' . $e->getMessage());
+    }
+
 
     echo json_encode(['msg' => 'Ordem de serviço excluída com sucesso']);
+  }
+  public function logs()
+  {
+    $id = $_GET['id'] ?? null;
+
+    if (!$id || !is_numeric($id)) {
+      error_log("Entrou no bloco de ID inválido: id = " . var_export($id, true));
+
+      http_response_code(400);
+      echo json_encode(['erro' => 'ID inválido']);
+      return;
+    }
+
+    $pdo = Database::connect();
+
+    $stmt = $pdo->prepare("SELECT id FROM ordens_servico WHERE id = ?");
+    $stmt->execute([$id]);
+
+    if (!$stmt->fetch()) {
+      http_response_code(404);
+      echo json_encode(['erro' => 'Ordem de serviço não encontrada']);
+      return;
+    }
+
+    $stmt = $pdo->prepare("
+    SELECT acao, data_alteracao, alterado_por, detalhes
+    FROM logs_ordens_servico
+    WHERE ordem_id = ?
+    ORDER BY data_alteracao DESC
+  ");
+    $stmt->execute([$id]);
+
+    $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $formatados = array_map(function ($log) {
+      return [
+        'mensagem' => strtoupper($log['acao']),
+        'data' => date('d/m/Y H:i', strtotime($log['data_alteracao'])),
+        'detalhes' => $log['detalhes'],
+        'alterado_por' => $log['alterado_por'] ?? 'Sistema'
+      ];
+    }, $logs);
+
+    echo json_encode($formatados);
   }
 }
