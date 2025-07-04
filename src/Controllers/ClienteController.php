@@ -95,13 +95,13 @@ class ClienteController
 
     if(!$stmt->fetch()) {
       http_response_code(404);
-      echo json_encode("Cliente não encontrado");
+      echo json_encode(['msg' => "Cliente não encontrado"]);
       return;
     }
 
     $stmt = $pdo->prepare("DELETE FROM clientes WHERE cpf = ?");
     $stmt->execute([$cpf]);
 
-    echo json_encode('Cliente deletado com sucesso');
+    echo json_encode(['msg' => 'Cliente deletado com sucesso']);
   }
 }
