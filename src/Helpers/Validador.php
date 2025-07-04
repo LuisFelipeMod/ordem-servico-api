@@ -10,7 +10,7 @@ class Validador
     $cpf = preg_replace('/[^0-9]/', '', $cpf);
 
     // Verifica se tem 11 dígitos e se não é repetido
-    if (strlen($cpf) != 11 || preg_match('/(\d)1{10}', $cpf)) {
+    if (strlen($cpf) != 11 || preg_match('/^(\d)\1{10}$/', preg_replace('/\D/', '', $cpf))) {
       return false;
     }
     
