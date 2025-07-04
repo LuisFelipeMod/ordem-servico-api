@@ -71,6 +71,11 @@ composer install
 php -S localhost:8000 -t public
 ```
 
+7. Para executar os testes automatizados:
+```bash
+./vendor/bin/phpunit
+```
+
 ## Rotas principais
 
 POST /api/login - autenticação e geração do token JWT
