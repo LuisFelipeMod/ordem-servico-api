@@ -3,4 +3,12 @@ CREATE TABLE IF NOT EXISTS clientes (
   nome VARCHAR(100) NOT NULL,
   cpf VARCHAR(14) NOT NULL UNIQUE,
   endereco TEXT NOT NULL
-)
+);
+
+CREATE TABLE IF NOT EXISTS produtos (
+  id SERIAL PRIMARY KEY,
+  codigo VARCHAR(50) NOT NULL UNIQUE,
+  descricao TEXT NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  tempo_garantia INT NOT NULL
+);
