@@ -45,3 +45,13 @@ CREATE TABLE
     senha TEXT NOT NULL,
     role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'usuario'))
   );
+
+INSERT INTO
+  usuarios (nome, email, senha, role)
+VALUES
+  (
+    'Usuário Teste',
+    'teste@email.com',
+    '$2y$10$sH0zy9EmZbSXd8Zwl.qkQuMFbrXWslvv0d1h44cB7XpFLFuJLxfrq', -- senha: 123456
+    'admin'
+  );
